@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/NetLagina/Brainfuck-Interpreter.svg?branch=master)](https://travis-ci.org/NetLagina/Brainfuck-Interpreter)
 # Brainfuck-Interpreter
 
 ## About
