@@ -99,6 +99,7 @@ public class Brainfuck {
 				break;
 			case ' ':
 			case '\n':
+			case '\r':
 				break;
 			default:
 				throw new IllegalOperatorException(String.valueOf(command));
