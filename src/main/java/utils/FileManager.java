@@ -14,7 +14,7 @@ import java.util.Map;
 public class FileManager {
 	
 	private final Map<Integer, File> fileManager;
-	private final Map<Integer, Integer> indexManager;
+	private final Map<String, Integer> indexManager;
 	private int fileId;
 	
 	public FileManager() {
@@ -23,15 +23,15 @@ public class FileManager {
 		fileId = 0;
 	}
 	
-	public String add(File file, int fileIndex) {
+	public String add(File file, String filePath) {
 		if (!fileManager.containsValue(file)) {
-			indexManager.put(fileIndex, fileId);
+			indexManager.put(filePath, fileId);
 			fileManager.put(fileId++, file);
 			return file.getName();
 		} else {
 			for (int i = 0; i < fileId; i++) {
 				if (file == fileManager.get(i)) {
-					indexManager.put(fileIndex, i);
+					indexManager.put(filePath, i);
 					return file.getName();
 				}
 			}
@@ -39,17 +39,17 @@ public class FileManager {
 		return "New tab";
 	}
 	
-	public File get(int fileIndex) {
-		if (indexManager.containsKey(fileIndex)) {
-			return fileManager.get(indexManager.get(fileIndex));
+	public File get(String filePath) {
+		if (indexManager.containsKey(filePath)) {
+			return fileManager.get(indexManager.get(filePath));
 		}
 		return new File(".");
 	}
 	
-	public boolean remove(int fileIndex) {
-		if (indexManager.containsValue(fileIndex)) {
-			fileManager.remove(indexManager.get(fileIndex));
-			indexManager.remove(fileIndex);
+	public boolean remove(String filePath) {
+		if (indexManager.containsKey(filePath)) {
+			fileManager.remove(indexManager.get(filePath));
+			indexManager.remove(filePath);
 			return true;
 		}
 		return false;

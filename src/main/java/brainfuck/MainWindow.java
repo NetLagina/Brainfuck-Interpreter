@@ -20,9 +20,6 @@ import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
-import java.util.ArrayList;
-import java.util.List;
-
 import exception.IllegalOperatorException;
 import exception.PointerOutOfBoundsException;
 import utils.BrainfuckFileFilter;
@@ -44,7 +41,6 @@ public class MainWindow {
 	private final static String RESULT_PANEL = "Result";
 	
 	private JFrame frmBrainfuckInterpreter;
-	private List<JMainPanel> tabs;
 	private JTextArea taResult;
 	private JTabbedPane tabbedPane;
 
@@ -65,7 +61,6 @@ public class MainWindow {
 
 	public MainWindow() {
 		fileManager = new FileManager();
-		tabs = new ArrayList<>();
 		initialize();
 	}
 
@@ -76,7 +71,6 @@ public class MainWindow {
 		frmBrainfuckInterpreter.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		final JMainPanel panel = new JMainPanel();
-		tabs.add(panel);
 		
 		/* START Menu Bar */
 		JMenuBar menuBar = new JMenuBar();
@@ -92,7 +86,6 @@ public class MainWindow {
 			public void actionPerformed(ActionEvent arg0) {
 				JMainPanel panel = new JMainPanel();
 				panel.getTaCodeEditor().setText("");
-				tabs.add(panel);
 				tabbedPane.addTab(NEW_TAB, panel);
 				tabbedPane.setSelectedComponent(panel);
 			}
@@ -106,17 +99,16 @@ public class MainWindow {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser fileChooser = new JFileChooser();
 				fileChooser.setFileFilter(new BrainfuckFileFilter());
-				int returnValue = fileChooser.showOpenDialog(tabs.get(tabbedPane.getSelectedIndex()).getTaCodeEditor());
+				int returnValue = fileChooser.showOpenDialog(((JMainPanel) tabbedPane.getSelectedComponent()).getTaCodeEditor());
 				File file = null;
 				if (returnValue == JFileChooser.APPROVE_OPTION) {
 					file = fileChooser.getSelectedFile();
 					String code = fileManager.load(file);
 					JMainPanel panel = new JMainPanel();
 					panel.getTaCodeEditor().setText(code);
-					tabs.add(panel);
-					tabbedPane.addTab(file.getName(), panel);
+					tabbedPane.addTab(file.getAbsolutePath(), panel);
 					tabbedPane.setSelectedComponent(panel);
-					fileManager.add(file, tabbedPane.getSelectedIndex());
+					fileManager.add(file, file.getAbsolutePath());
 				}
 			}
 		});
@@ -133,14 +125,12 @@ public class MainWindow {
 		mntmClose.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK));
 		mntmClose.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				fileManager.remove(tabbedPane.getTitleAt(tabbedPane.getSelectedIndex()));
+				tabbedPane.remove(tabbedPane.getComponentAt(tabbedPane.getSelectedIndex()));
 				JMainPanel newPanel = null;
-				if (tabbedPane.getTabCount() == 1) {
+				if (tabbedPane.getTabCount() == 0) {
 					newPanel = new JMainPanel();
 					tabbedPane.addTab(NEW_TAB, newPanel);
-				}
-				fileManager.remove(tabbedPane.getSelectedIndex());
-				tabbedPane.remove(tabbedPane.getComponentAt(tabbedPane.getSelectedIndex()));
-				if (tabbedPane.getTabCount() == 1) {
 					tabbedPane.setSelectedComponent(newPanel);
 				}
 			}
@@ -160,15 +150,15 @@ public class MainWindow {
 			public void actionPerformed(ActionEvent arg0) {
 				File file = null;
 				if (tabbedPane.getTitleAt(tabbedPane.getSelectedIndex()) != NEW_TAB) {
-					file = fileManager.get(tabbedPane.getSelectedIndex());
-					fileManager.save(file, tabs.get(tabbedPane.getSelectedIndex()).getTaCodeEditor().getText());
+					file = fileManager.get(tabbedPane.getTitleAt(tabbedPane.getSelectedIndex()));
+					fileManager.save(file, ((JMainPanel) tabbedPane.getSelectedComponent()).getTaCodeEditor().getText());
 				} else {
 					JFileChooser fileChooser = new JFileChooser();
 					fileChooser.setFileFilter(new BrainfuckFileFilter());
-					int returnValue = fileChooser.showSaveDialog(tabs.get(tabbedPane.getSelectedIndex()).getTaCodeEditor());
+					int returnValue = fileChooser.showSaveDialog(((JMainPanel) tabbedPane.getSelectedComponent()).getTaCodeEditor());
 					if (returnValue == JFileChooser.APPROVE_OPTION) {
 						file = fileChooser.getSelectedFile();
-						fileManager.save(file, tabs.get(tabbedPane.getSelectedIndex()).getTaCodeEditor().getText());
+						fileManager.save(file, ((JMainPanel) tabbedPane.getSelectedComponent()).getTaCodeEditor().getText());
 						tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), file.getName());
 					}
 				}
@@ -184,10 +174,10 @@ public class MainWindow {
 				File file = null;
 				JFileChooser fileChooser = new JFileChooser();
 				fileChooser.setFileFilter(new BrainfuckFileFilter());
-				int returnValue = fileChooser.showSaveDialog(tabs.get(tabbedPane.getSelectedIndex()).getTaCodeEditor());
+				int returnValue = fileChooser.showSaveDialog(((JMainPanel) tabbedPane.getSelectedComponent()).getTaCodeEditor());
 				if (returnValue == JFileChooser.APPROVE_OPTION) {
 					file = fileChooser.getSelectedFile();
-					fileManager.save(file, tabs.get(tabbedPane.getSelectedIndex()).getTaCodeEditor().getText());
+					fileManager.save(file, ((JMainPanel) tabbedPane.getSelectedComponent()).getTaCodeEditor().getText());
 					tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), file.getName());
 				}
 			}
@@ -220,9 +210,9 @@ public class MainWindow {
 		mntmRun.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F11, InputEvent.CTRL_DOWN_MASK));
 		mntmRun.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String code = tabs.get(tabbedPane.getSelectedIndex()).getTaCodeEditor().getText();
+				String code = ((JMainPanel) tabbedPane.getSelectedComponent()).getTaCodeEditor().getText();
 				Brainfuck brainfuck = new Brainfuck(code);
-				String input = tabs.get(tabbedPane.getSelectedIndex()).getTfArguments().getText();
+				String input = ((JMainPanel) tabbedPane.getSelectedComponent()).getTfArguments().getText();
 				String result;
 				try {
 					result = brainfuck.process(input);
