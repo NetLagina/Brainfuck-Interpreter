@@ -100,9 +100,8 @@ public class Brainfuck {
 			case ' ':
 			case '\n':
 			case '\r':
-				break;
 			default:
-				throw new IllegalOperatorException(String.valueOf(command));
+				break;
 			}
 
 			++commandPointer;
