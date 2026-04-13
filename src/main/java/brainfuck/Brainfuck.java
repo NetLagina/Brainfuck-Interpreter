@@ -67,7 +67,7 @@ public class Brainfuck {
         loopManager = new LoopManager(loopBeginPointers, loopEndPointers);
     }
 
-    public String process(String input) throws PointerOutOfBoundsException, IOException, IllegalOperatorException {
+    public String process(String input) throws PointerOutOfBoundsException, IOException {
         this.inputString = input;
 
         while (commandPointer < code.length()) {

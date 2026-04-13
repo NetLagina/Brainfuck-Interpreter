@@ -49,15 +49,15 @@ public class FileManager {
     }
 
     public String load(File file) {
-        String code = "";
+        StringBuilder code = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
             while (br.ready()) {
-                code = code + br.readLine() + System.lineSeparator();
+                code.append(br.readLine()).append(System.lineSeparator());
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return code;
+        return code.toString();
     }
 
     public boolean save(File file, String code) {

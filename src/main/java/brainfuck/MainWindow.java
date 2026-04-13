@@ -35,7 +35,7 @@ public class MainWindow {
 
     private final FileManager fileManager;
 
-    public static void main(String[] args) {
+    static void main() {
         EventQueue.invokeLater(() -> {
             try {
                 MainWindow window = new MainWindow();
@@ -189,7 +189,7 @@ public class MainWindow {
             try {
                 result = brainfuck.process(input);
                 taResult.setText(result);
-            } catch (PointerOutOfBoundsException | IOException | IllegalOperatorException exception) {
+            } catch (PointerOutOfBoundsException | IOException exception) {
                 taResult.setText(exception.toString());
             }
         });
